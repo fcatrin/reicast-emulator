@@ -20,7 +20,7 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 
 import com.reicast.emulator.MainActivity;
-import com.reicast.emulator.R;
+import retrox.reicast.emulator.R;
 import com.reicast.emulator.emu.GL2JNIView;
 import com.reicast.emulator.emu.JNIdc;
 import com.reicast.emulator.emu.OnScreenMenu;

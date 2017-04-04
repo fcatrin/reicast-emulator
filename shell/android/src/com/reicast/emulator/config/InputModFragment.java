@@ -38,7 +38,7 @@ import android.widget.TextView;
 
 import de.ankri.views.Switch;
 
-import com.reicast.emulator.R;
+import retrox.reicast.emulator.R;
 import com.reicast.emulator.periph.Gamepad;
 
 public class InputModFragment extends Fragment {

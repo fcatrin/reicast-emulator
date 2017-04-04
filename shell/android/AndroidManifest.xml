@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.reicast.emulator"
+    package="retrox.reicast.emulator"
     android:versionCode="7"
     android:versionName="r7" >
     
@@ -53,7 +53,7 @@
             android:resource="@drawable/ic_xperia_play" />
 
         <activity
-            android:name=".MainActivity"
+            android:name="com.reicast.emulator.MainActivity"
             android:configChanges="orientation|navigation|screenSize|screenLayout|uiMode|keyboard|keyboardHidden"
             android:label="@string/app_name" >
             <intent-filter>
@@ -102,7 +102,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".GL2JNIActivity"
+            android:name="com.reicast.emulator.GL2JNIActivity"
             android:configChanges="orientation|navigation|screenSize|screenLayout|uiMode|keyboard|keyboardHidden"
             android:screenOrientation="sensorLandscape"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
@@ -111,7 +111,7 @@
                 android:value="dc" />
         </activity>
         <activity
-            android:name=".GL2JNINative"
+            android:name="com.reicast.emulator.GL2JNINative"
             android:configChanges="orientation|navigation|screenSize|screenLayout|uiMode|keyboard|keyboardHidden"
             android:screenOrientation="sensorLandscape"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
@@ -136,7 +136,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".config.EditVJoyActivity"
+            android:name="com.reicast.emulator.config.EditVJoyActivity"
             android:configChanges="orientation|navigation|screenSize|screenLayout|uiMode|keyboard|keyboardHidden"
             android:screenOrientation="sensorLandscape"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />

@@ -44,7 +44,7 @@ import de.ankri.views.Switch;
 
 import com.android.util.FileUtils;
 import com.reicast.emulator.FileBrowser;
-import com.reicast.emulator.R;
+import retrox.reicast.emulator.R;
 import com.reicast.emulator.emu.GL2JNIView;
 import com.reicast.emulator.emu.JNIdc;
 

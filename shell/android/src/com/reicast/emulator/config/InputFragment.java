@@ -37,7 +37,7 @@ import com.bda.controller.ControllerListener;
 import com.bda.controller.MotionEvent;
 import com.bda.controller.StateEvent;
 import com.reicast.emulator.MainActivity;
-import com.reicast.emulator.R;
+import retrox.reicast.emulator.R;
 import com.reicast.emulator.periph.Gamepad;
 import com.reicast.emulator.periph.MOGAInput;
 

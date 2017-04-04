@@ -37,7 +37,7 @@ import com.android.util.FileUtils;
 import com.reicast.emulator.GL2JNIActivity;
 import com.reicast.emulator.GL2JNINative;
 import com.reicast.emulator.MainActivity;
-import com.reicast.emulator.R;
+import retrox.reicast.emulator.R;
 import com.reicast.emulator.config.Config;
 import com.reicast.emulator.emu.OnScreenMenu.FpsPopup;
 import com.reicast.emulator.periph.VJoy;
