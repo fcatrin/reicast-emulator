@@ -381,12 +381,12 @@ public class FileBrowser extends Fragment {
 				new OnClickListener() {
 					public void onClick(View view) {
 						if (isGame) {
-							vib.vibrate(50);
+							if (vib!=null) vib.vibrate(50);
 							mCallback.onGameSelected(game != null ? Uri
 									.fromFile(game) : Uri.EMPTY);
-							vib.vibrate(250);
+							if (vib!=null) vib.vibrate(250);
 						} else {
-							vib.vibrate(50);
+							if (vib!=null) vib.vibrate(50);
 							home_directory = game.getAbsolutePath().substring(0,
 									game.getAbsolutePath().lastIndexOf(File.separator)).replace("/data", "");
 							if (!DataDirectoryBIOS()) {
