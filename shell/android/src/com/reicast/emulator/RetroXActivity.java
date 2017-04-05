@@ -20,14 +20,13 @@ public class RetroXActivity extends Activity {
 
 		// TODO set error handler
 
-		JNIdc.config(getFilesDir().getAbsolutePath()); // TODO check if this requires something special
+		String homePath  = getIntent().getStringExtra("homePath");  // location for dc_boot.bin and dc_flash.bin
+		JNIdc.config(homePath);
 		
 		// Read intent from RetroX
-		String gamePath = getIntent().getStringExtra("PATH_GAME");
+		String gamePath = getIntent().getStringExtra("gamePath");
 		onGameSelected(Uri.parse(gamePath));
 		
-		String biosPath  = getIntent().getStringExtra("PATH_BIOS");  // dc_boot.bin
-		String flashPath = getIntent().getStringExtra("PATH_FLASH"); // dc_flash.bin
 		
 		// TODO read other intent data
 		
