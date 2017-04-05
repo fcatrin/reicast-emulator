@@ -44,13 +44,16 @@ public class RetroXActivity extends Activity {
 
 	public void onGameSelected(Uri uri) {
 		Config.nativeact = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean(Config.pref_nativeact, Config.nativeact);
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD && Config.nativeact) {
-			startActivity(new Intent("com.reicast.EMULATOR", uri, getApplicationContext(),
-					GL2JNINative.class));
-		} else {
-			startActivity(new Intent("com.reicast.EMULATOR", uri, getApplicationContext(),
-					GL2JNIActivity.class));
-		}
+		Class<? extends Activity> activityClass = 
+				(Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD && Config.nativeact) ?
+				GL2JNINative.class :
+				GL2JNIActivity.class;
+		
+		Intent intent = new Intent("com.reicast.EMULATOR", uri, getApplicationContext(), activityClass);
+		intent.putExtra("retrox", true);
+		intent.putExtra("infoTop"   , getIntent().getStringExtra("infoTop"));
+		intent.putExtra("infoBottom", getIntent().getStringExtra("infoBottom"));
+		startActivity(intent);
 	}
 	
 	@Override

@@ -581,6 +581,7 @@ public class GL2JNIView extends GLSurfaceView
 		{
 			gl.glViewport(0, 0, width, height);
 			JNIdc.rendinit(width,height);
+			Log.d("PAUSE", "onSurfaceChanged " + width + "x" + height);
 		}
 
 		public void onSurfaceCreated(GL10 gl,EGLConfig config)
@@ -738,11 +739,18 @@ public class GL2JNIView extends GLSurfaceView
 					| View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
 			requestLayout();
 		}
+		Log.d("PAUSE", "onWindowFocusChanged " + hasFocus);
 	}
 
 	private boolean takeScreenshot = false;
 	public void screenGrab() {
 		takeScreenshot = true;
 	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+	}
+	
 	
 }

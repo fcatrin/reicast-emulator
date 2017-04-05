@@ -1,28 +1,9 @@
 package com.reicast.emulator;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-
-import tv.ouya.console.api.OuyaController;
-import android.annotation.TargetApi;
-import android.app.Activity;
-import android.content.SharedPreferences;
-import android.content.res.Configuration;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.util.Log;
-import android.view.Gravity;
-import android.view.InputDevice;
-import android.view.KeyEvent;
-import android.view.MotionEvent;
-import android.view.ViewConfiguration;
-import android.view.ViewGroup.LayoutParams;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.LinearLayout;
-import android.widget.PopupWindow;
+import java.util.List;
 
 import com.reicast.emulator.config.Config;
 import com.reicast.emulator.emu.GL2JNIView;
@@ -34,6 +15,38 @@ import com.reicast.emulator.emu.OnScreenMenu.VmuPopup;
 import com.reicast.emulator.periph.Gamepad;
 import com.reicast.emulator.periph.MOGAInput;
 import com.reicast.emulator.periph.SipEmulator;
+
+import android.annotation.TargetApi;
+import android.app.Activity;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Handler;
+import android.preference.PreferenceManager;
+import android.util.Log;
+import android.view.Gravity;
+import android.view.InputDevice;
+import android.view.KeyEvent;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewConfiguration;
+import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.PopupWindow;
+import retrobox.utils.GamepadInfoDialog;
+import retrobox.utils.ListOption;
+import retrobox.utils.RetroBoxDialog;
+import retrobox.utils.RetroBoxUtils;
+import retrox.reicast.emulator.R;
+import tv.ouya.console.api.OuyaController;
+import xtvapps.core.AndroidFonts;
+import xtvapps.core.Callback;
+import xtvapps.core.SimpleCallback;
+import xtvapps.core.content.KeyValue;
 
 @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR1)
 public class GL2JNIActivity extends Activity {
@@ -49,7 +62,10 @@ public class GL2JNIActivity extends Activity {
 	private Gamepad pad = new Gamepad();
 
 	public static byte[] syms;
-
+	
+	private boolean isRetroX = false;
+	private GamepadInfoDialog gamepadInfoDialog;
+	
 	@Override
 	protected void onCreate(Bundle icicle) {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -59,6 +75,9 @@ public class GL2JNIActivity extends Activity {
 					WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
 					WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
 		}
+		
+		isRetroX = getIntent().getBooleanExtra("retrox", false);
+		
 		config = new Config(GL2JNIActivity.this);
 		config.getConfigurationPrefs();
 		menu = new OnScreenMenu(GL2JNIActivity.this, prefs);
@@ -201,7 +220,25 @@ public class GL2JNIActivity extends Activity {
 		// Create the actual GLES view
 		mView = new GL2JNIView(GL2JNIActivity.this, config, fileName, false,
 				prefs.getInt(Config.pref_renderdepth, 24), 0, false);
-		setContentView(mView);
+		
+		if (isRetroX) {
+			setContentView(R.layout.game_view);
+			ViewGroup containerView = (ViewGroup)findViewById(R.id.game_view);
+			containerView.addView(mView, 0);
+
+			/*
+	        AndroidFonts.setViewFont(findViewById(R.id.txtDialogListTitle), RetroBoxUtils.FONT_DEFAULT_M);
+
+			AndroidFonts.setViewFont(findViewById(R.id.txtGamepadInfoTop), RetroBoxUtils.FONT_DEFAULT_M);
+	        AndroidFonts.setViewFont(findViewById(R.id.txtGamepadInfoBottom), RetroBoxUtils.FONT_DEFAULT_M);
+			 */
+	        gamepadInfoDialog = new GamepadInfoDialog(this);
+	        gamepadInfoDialog.loadFromIntent(getIntent());
+
+			
+		} else {
+			setContentView(mView);
+		}
 
 		//setup mic
 		boolean micPluggedIn = prefs.getBoolean(Config.pref_mic, false);
@@ -534,10 +571,17 @@ public class GL2JNIActivity extends Activity {
 			}
 		}
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
-			if (pad.isXperiaPlay) {
-				return true;
+			if (isRetroX) {
+				if (RetroBoxDialog.cancelDialog(this)) return true;
+		    	
+		    	openRetroBoxMenu(true);
+		    	return true;
 			} else {
-				return showMenu();
+				if (pad.isXperiaPlay) {
+					return true;
+				} else {
+					return showMenu();
+				}
 			}
 		}
 		return super.onKeyDown(keyCode, event);
@@ -569,6 +613,7 @@ public class GL2JNIActivity extends Activity {
 	@Override
 	protected void onPause() {
 		super.onPause();
+		Log.d("PAUSE", "On pause");
 		mView.onPause();
 		moga.onPause();
 	}
@@ -595,7 +640,71 @@ public class GL2JNIActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+		Log.d("PAUSE", "On resume");
 		mView.onResume();
 		moga.onResume();
 	}
+	
+    private void openRetroBoxMenu(final boolean pause) {
+    	new Handler().postDelayed(new Runnable(){
+
+			@Override
+			public void run() {
+				openRetroBoxMenuPost(pause);
+			}
+		}, 100);
+    }
+    
+    
+	private void uiQuit() {
+		finish();
+	}
+	
+    protected void uiHelp() {
+		RetroBoxDialog.showGamepadDialogIngame(this, gamepadInfoDialog, null);
+    }
+
+    
+    private void openRetroBoxMenuPost(boolean pause) {
+    	onPause();
+
+    	final ViewGroup containerView = (ViewGroup)findViewById(R.id.game_view);
+    	View menuView = getLayoutInflater().inflate(R.layout.modal_dialog_list, null);
+		containerView.addView(menuView, 1);
+    	
+    	List<ListOption> options = new ArrayList<ListOption>();
+    	options.add(new ListOption("", getString(R.string.emu_opt_cancel)));
+    	options.add(new ListOption("help", getString(R.string.emu_opt_help)));
+    	options.add(new ListOption("quit", getString(R.string.emu_opt_quit)));
+    	
+    	
+    	RetroBoxDialog.showListDialog(this, getString(R.string.emu_opt_title), options, new Callback<KeyValue>() {
+			@Override
+			public void onResult(KeyValue result) {
+				String key = result.getKey();
+				if (key.equals("quit")) {
+					uiQuit();
+					return;
+				} else if (key.equals("help")) {
+					uiHelp();
+					return;
+				}
+				resume();
+			}
+
+			private void resume() {
+				containerView.removeViewAt(1);
+				onResume();
+			}
+			
+			@Override
+			public void onError() {
+				resume();
+			}
+			
+		});
+    	
+    }
+    
+
 }
