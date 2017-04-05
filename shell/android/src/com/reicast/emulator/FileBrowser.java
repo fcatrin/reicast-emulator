@@ -332,10 +332,10 @@ public class FileBrowser extends Fragment {
 					new OnClickListener() {
 						public void onClick(View view) {
 							File f = (File) view.getTag();
-							vib.vibrate(50);
+							if (vib!=null) vib.vibrate(50);
 							mCallback.onGameSelected(f != null ? Uri
 									.fromFile(f) : Uri.EMPTY);
-							vib.vibrate(250);
+							if (vib!=null) vib.vibrate(250);
 						}
 					});
 
