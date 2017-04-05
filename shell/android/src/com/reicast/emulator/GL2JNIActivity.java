@@ -613,7 +613,6 @@ public class GL2JNIActivity extends Activity {
 	@Override
 	protected void onPause() {
 		super.onPause();
-		Log.d("PAUSE", "On pause");
 		mView.onPause();
 		moga.onPause();
 	}
@@ -640,7 +639,6 @@ public class GL2JNIActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		Log.d("PAUSE", "On resume");
 		mView.onResume();
 		moga.onResume();
 	}
