@@ -40,6 +40,7 @@ import android.widget.PopupWindow;
 import retrobox.utils.GamepadInfoDialog;
 import retrobox.utils.ListOption;
 import retrobox.utils.RetroBoxDialog;
+import retrobox.utils.RetroBoxUtils;
 import retrobox.vinput.AnalogGamepad;
 import retrobox.vinput.AnalogGamepad.Axis;
 import retrobox.vinput.AnalogGamepadListener;
@@ -51,6 +52,7 @@ import retrobox.vinput.VirtualEvent.MouseButton;
 import retrobox.vinput.VirtualEventDispatcher;
 import retrox.reicast.emulator.R;
 import tv.ouya.console.api.OuyaController;
+import xtvapps.core.AndroidFonts;
 import xtvapps.core.Callback;
 import xtvapps.core.content.KeyValue;
 
@@ -746,9 +748,13 @@ public class GL2JNIActivity extends Activity {
     private void openRetroBoxMenuPost(boolean pause) {
     	onPause();
 
+    	// must be done this way, if not, there is a black hole in the GL surface after closing the popup
+    	// only adding and removing the view makes the GL surface resets its state
     	final ViewGroup containerView = (ViewGroup)findViewById(R.id.game_view);
     	View menuView = getLayoutInflater().inflate(R.layout.modal_dialog_list, null);
 		containerView.addView(menuView, 1);
+		
+		AndroidFonts.setViewFont(findViewById(R.id.txtDialogListTitle), RetroBoxUtils.FONT_DEFAULT_M);
     	
     	List<ListOption> options = new ArrayList<ListOption>();
     	options.add(new ListOption("", getString(R.string.emu_opt_cancel)));
