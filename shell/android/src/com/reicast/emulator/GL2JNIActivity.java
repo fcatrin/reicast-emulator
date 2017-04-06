@@ -54,6 +54,7 @@ import retrox.reicast.emulator.R;
 import tv.ouya.console.api.OuyaController;
 import xtvapps.core.AndroidFonts;
 import xtvapps.core.Callback;
+import xtvapps.core.SimpleCallback;
 import xtvapps.core.content.KeyValue;
 
 @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR1)
@@ -72,7 +73,6 @@ public class GL2JNIActivity extends Activity {
 	public static byte[] syms;
 	
 	private boolean isRetroX = false;
-	private GamepadInfoDialog gamepadInfoDialog;
 	private VirtualInputDispatcher vinputDispatcher;
 	private AnalogGamepad analogGamepad;
 	private Mapper mapper;
@@ -250,9 +250,6 @@ public class GL2JNIActivity extends Activity {
         		Mapper.registerGamepad(i, deviceDescriptor);
             }
 			
-	        gamepadInfoDialog = new GamepadInfoDialog(this);
-	        gamepadInfoDialog.loadFromIntent(getIntent());
-
         	vinputDispatcher = new VirtualInputDispatcher();
         	
             mapper = new Mapper(getIntent(), vinputDispatcher);
@@ -740,27 +737,68 @@ public class GL2JNIActivity extends Activity {
 		finish();
 	}
 	
-    protected void uiHelp() {
-		RetroBoxDialog.showGamepadDialogIngame(this, gamepadInfoDialog, null);
-    }
-
-    
-    private void openRetroBoxMenuPost(boolean pause) {
-    	onPause();
-
+	protected void pushRetroXView(int resourceId) {
     	// must be done this way, if not, there is a black hole in the GL surface after closing the popup
     	// only adding and removing the view makes the GL surface resets its state
-    	final ViewGroup containerView = (ViewGroup)findViewById(R.id.game_view);
-    	View menuView = getLayoutInflater().inflate(R.layout.modal_dialog_list, null);
-		containerView.addView(menuView, 1);
-		
-		AndroidFonts.setViewFont(findViewById(R.id.txtDialogListTitle), RetroBoxUtils.FONT_DEFAULT_M);
+
+		final ViewGroup containerView = (ViewGroup)findViewById(R.id.game_view);
+    	int childIndex = 0;
+    	while (childIndex < containerView.getChildCount()) {
+    		View view = containerView.getChildAt(childIndex);
+    		Object tag = containerView.getTag();
+    		if (tag instanceof String && "rxtag".equals(tag)) {
+    			containerView.removeView(view);
+    			continue;
+    		}
+    		childIndex++;
+    	}
+    	
+    	// add new view if there is any
+    	if (resourceId > 0) {
+    		View view = getLayoutInflater().inflate(resourceId, null);
+    		view.setTag("rxtag");
+    		containerView.addView(view, 1);
+
+    		if (resourceId == R.layout.modal_dialog_list) {
+    			AndroidFonts.setViewFont(findViewById(R.id.txtDialogListTitle), RetroBoxUtils.FONT_DEFAULT_M);
+    		}
+    	}
+	}
+	
+    protected void uiHelp() {
+    	pushRetroXView(R.layout.modal_dialog_gamepad);
+    	
+    	GamepadInfoDialog gamepadInfoDialog = new GamepadInfoDialog(this);
+        gamepadInfoDialog.loadFromIntent(getIntent());
+
+		RetroBoxDialog.showGamepadDialogIngame(this, gamepadInfoDialog, new SimpleCallback() {
+			
+			@Override
+			public void onResult() {}
+
+			@Override
+			public void onFinally() {
+				closeRetroXMenu();
+			}
+			
+		});
+    }
+
+    protected void closeRetroXMenu() {
+    	ViewGroup containerView = (ViewGroup)findViewById(R.id.game_view);
+    	containerView.removeViewAt(1);
+    	onResume();
+    }
+    
+    private void openRetroBoxMenuPost(boolean pause) {
+    	if (pause) onPause();
+
+    	pushRetroXView(R.layout.modal_dialog_list);
     	
     	List<ListOption> options = new ArrayList<ListOption>();
     	options.add(new ListOption("", getString(R.string.emu_opt_cancel)));
     	options.add(new ListOption("help", getString(R.string.emu_opt_help)));
     	options.add(new ListOption("quit", getString(R.string.emu_opt_quit)));
-    	
     	
     	RetroBoxDialog.showListDialog(this, getString(R.string.emu_opt_title), options, new Callback<KeyValue>() {
 			@Override
@@ -773,17 +811,12 @@ public class GL2JNIActivity extends Activity {
 					uiHelp();
 					return;
 				}
-				resume();
+				closeRetroXMenu();
 			}
 
-			private void resume() {
-				containerView.removeViewAt(1);
-				onResume();
-			}
-			
 			@Override
 			public void onError() {
-				resume();
+				closeRetroXMenu();
 			}
 		});
     }
