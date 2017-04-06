@@ -26,6 +26,7 @@ extern "C"
   JNIEXPORT void JNICALL Java_com_reicast_emulator_emu_JNIdc_init(JNIEnv *env,jobject obj,jstring fileName)  __attribute__((visibility("default")));
   JNIEXPORT void JNICALL Java_com_reicast_emulator_emu_JNIdc_run(JNIEnv *env,jobject obj,jobject emu_thread)  __attribute__((visibility("default")));
   JNIEXPORT void JNICALL Java_com_reicast_emulator_emu_JNIdc_stop(JNIEnv *env,jobject obj)  __attribute__((visibility("default")));
+  JNIEXPORT void JNICALL Java_com_reicast_emulator_emu_JNIdc_setSavesDir(JNIEnv *env,jobject obj,jstring dirName)  __attribute__((visibility("default")));
 
   JNIEXPORT jint JNICALL Java_com_reicast_emulator_emu_JNIdc_send(JNIEnv *env,jobject obj,jint id, jint v)  __attribute__((visibility("default")));
   JNIEXPORT jint JNICALL Java_com_reicast_emulator_emu_JNIdc_data(JNIEnv *env,jobject obj,jint id, jbyteArray d)  __attribute__((visibility("default")));
@@ -264,6 +265,18 @@ JNIEXPORT void JNICALL Java_com_reicast_emulator_emu_JNIdc_config(JNIEnv *env,jo
 	printf("Data dir is:   %s\n", get_writable_data_path("/").c_str());
   env->ReleaseStringUTFChars(dirName,D);
 }
+
+JNIEXPORT void JNICALL Java_com_reicast_emulator_emu_JNIdc_setSavesDir(JNIEnv *env,jobject obj,jstring dirName)
+{
+  // Set home directory based on User config
+  const char* D = dirName? env->GetStringUTFChars(dirName,0):0;
+    set_user_saves_dir(D);
+	printf("Saves dir is: %s\n", get_writable_saves_path("/").c_str());
+  env->ReleaseStringUTFChars(dirName,D);
+}
+
+
+
 JNIEXPORT void JNICALL Java_com_reicast_emulator_emu_JNIdc_init(JNIEnv *env,jobject obj,jstring fileName)
 {
   // Get filename string from Java

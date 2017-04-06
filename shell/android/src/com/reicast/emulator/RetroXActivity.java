@@ -26,10 +26,7 @@ public class RetroXActivity extends Activity {
 		// Read intent from RetroX
 		String gamePath = getIntent().getStringExtra("gamePath");
 		onGameSelected(Uri.parse(gamePath));
-		
-		
-		// TODO read other intent data
-		
+
 		// Flush the intent to prevent multiple calls
 		getIntent().setData(null);
         setIntent(null);
@@ -51,6 +48,7 @@ public class RetroXActivity extends Activity {
 		
 		Intent intent = new Intent("com.reicast.EMULATOR", uri, getApplicationContext(), activityClass);
 		intent.putExtra("retrox", true);
+		JNIdc.setSavesDir(getIntent().getStringExtra("savesPath"));
 		
 		intent.fillIn(getIntent(), 0);
 		startActivity(intent);

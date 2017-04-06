@@ -15,6 +15,7 @@
 
 string user_config_dir;
 string user_data_dir;
+string user_saves_dir;
 std::vector<string> system_config_dirs;
 std::vector<string> system_data_dirs;
 
@@ -31,6 +32,11 @@ void set_user_config_dir(const string& dir)
 void set_user_data_dir(const string& dir)
 {
 	user_data_dir = dir;
+}
+
+void set_user_saves_dir(const string& dir)
+{
+	user_saves_dir = dir;
 }
 
 void add_system_config_dir(const string& dir)
@@ -79,6 +85,16 @@ string get_writable_data_path(const string& filename)
 	 */
 	return (user_data_dir + filename);
 }
+
+string get_writable_saves_path(const string& filename)
+{
+	/* saves path can be different from data path
+	 * to allow cloud sync
+	 */
+	return ((user_saves_dir.size() == 0) ? user_data_dir : user_saves_dir)
+			+ filename;
+}
+
 
 string get_readonly_data_path(const string& filename)
 {

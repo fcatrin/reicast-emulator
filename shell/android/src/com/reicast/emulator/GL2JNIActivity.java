@@ -236,13 +236,6 @@ public class GL2JNIActivity extends Activity {
 			setContentView(R.layout.game_view);
 			ViewGroup containerView = (ViewGroup)findViewById(R.id.game_view);
 			containerView.addView(mView, 0);
-
-			/*
-	        AndroidFonts.setViewFont(findViewById(R.id.txtDialogListTitle), RetroBoxUtils.FONT_DEFAULT_M);
-
-			AndroidFonts.setViewFont(findViewById(R.id.txtGamepadInfoTop), RetroBoxUtils.FONT_DEFAULT_M);
-	        AndroidFonts.setViewFont(findViewById(R.id.txtGamepadInfoBottom), RetroBoxUtils.FONT_DEFAULT_M);
-			 */
 			
             for(int i=0; i<4; i++) {
             	String prefix = "j" + (i+1);

@@ -253,12 +253,14 @@ public :
 //Set the path !
 void set_user_config_dir(const string& dir);
 void set_user_data_dir(const string& dir);
+void set_user_saves_dir(const string& dir);
 void add_system_config_dir(const string& dir);
 void add_system_data_dir(const string& dir);
 
 //subpath format: /data/fsca-table.bit
 string get_writable_config_path(const string& filename);
 string get_writable_data_path(const string& filename);
+string get_writable_saves_path(const string& filename);
 string get_readonly_config_path(const string& filename);
 string get_readonly_data_path(const string& filename);
 
