@@ -51,8 +51,8 @@ public class RetroXActivity extends Activity {
 		
 		Intent intent = new Intent("com.reicast.EMULATOR", uri, getApplicationContext(), activityClass);
 		intent.putExtra("retrox", true);
-		intent.putExtra("infoTop"   , getIntent().getStringExtra("infoTop"));
-		intent.putExtra("infoBottom", getIntent().getStringExtra("infoBottom"));
+		
+		intent.fillIn(getIntent(), 0);
 		startActivity(intent);
 	}
 	

@@ -40,12 +40,18 @@ import android.widget.PopupWindow;
 import retrobox.utils.GamepadInfoDialog;
 import retrobox.utils.ListOption;
 import retrobox.utils.RetroBoxDialog;
-import retrobox.utils.RetroBoxUtils;
+import retrobox.vinput.AnalogGamepad;
+import retrobox.vinput.AnalogGamepad.Axis;
+import retrobox.vinput.AnalogGamepadListener;
+import retrobox.vinput.GenericGamepad;
+import retrobox.vinput.GenericGamepad.Analog;
+import retrobox.vinput.Mapper;
+import retrobox.vinput.Mapper.ShortCut;
+import retrobox.vinput.VirtualEvent.MouseButton;
+import retrobox.vinput.VirtualEventDispatcher;
 import retrox.reicast.emulator.R;
 import tv.ouya.console.api.OuyaController;
-import xtvapps.core.AndroidFonts;
 import xtvapps.core.Callback;
-import xtvapps.core.SimpleCallback;
 import xtvapps.core.content.KeyValue;
 
 @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR1)
@@ -65,6 +71,9 @@ public class GL2JNIActivity extends Activity {
 	
 	private boolean isRetroX = false;
 	private GamepadInfoDialog gamepadInfoDialog;
+	private VirtualInputDispatcher vinputDispatcher;
+	private AnalogGamepad analogGamepad;
+	private Mapper mapper;
 	
 	@Override
 	protected void onCreate(Bundle icicle) {
@@ -232,10 +241,51 @@ public class GL2JNIActivity extends Activity {
 			AndroidFonts.setViewFont(findViewById(R.id.txtGamepadInfoTop), RetroBoxUtils.FONT_DEFAULT_M);
 	        AndroidFonts.setViewFont(findViewById(R.id.txtGamepadInfoBottom), RetroBoxUtils.FONT_DEFAULT_M);
 			 */
+			
+            for(int i=0; i<4; i++) {
+            	String prefix = "j" + (i+1);
+            	String deviceDescriptor = getIntent().getStringExtra(prefix + "DESCRIPTOR");
+        		Mapper.registerGamepad(i, deviceDescriptor);
+            }
+			
 	        gamepadInfoDialog = new GamepadInfoDialog(this);
 	        gamepadInfoDialog.loadFromIntent(getIntent());
 
-			
+        	vinputDispatcher = new VirtualInputDispatcher();
+        	
+            mapper = new Mapper(getIntent(), vinputDispatcher);
+            Mapper.initGestureDetector(this);
+            Mapper.joinPorts = getIntent().getBooleanExtra("joinPorts", false);
+            
+        	analogGamepad = new AnalogGamepad(0, 0, new AnalogGamepadListener() {
+    			
+    			@Override
+    			public void onMouseMoveRelative(float mousex, float mousey) {}
+    			
+    			@Override
+    			public void onMouseMove(int mousex, int mousey) {}
+    			
+    			@Override
+    			public void onAxisChange(GenericGamepad gamepad, float axisx, float axisy, float hatx, float haty, float raxisx, float raxisy) {
+					vinputDispatcher.sendAnalog(gamepad, Analog.LEFT, axisx, -axisy, hatx, haty);
+					vinputDispatcher.sendAnalog(gamepad, Analog.RIGHT, raxisx, raxisy, 0, 0);
+    			}
+
+				@Override
+				public void onDigitalX(GenericGamepad gamepad, Axis axis, boolean on) {}
+
+				@Override
+				public void onDigitalY(GenericGamepad gamepad, Axis axis, boolean on) {}
+				
+				@Override
+				public void onTriggers(String deviceDescriptor, int deviceId, boolean left, boolean right) {}
+				
+				@Override
+				public void onTriggersAnalog(GenericGamepad gamepad , int deviceId, float left, float right) {
+					vinputDispatcher.sendTriggers(gamepad, deviceId, left, right); 
+				}
+
+    		});
 		} else {
 			setContentView(mView);
 		}
@@ -275,6 +325,15 @@ public class GL2JNIActivity extends Activity {
 
 	@Override
 	public boolean onGenericMotionEvent(MotionEvent event) {
+		if (isRetroX) {
+	    	if (RetroBoxDialog.isDialogVisible(this)) {
+	    		return super.onGenericMotionEvent(event);
+	    	}
+	    	
+			if (analogGamepad != null && analogGamepad.onGenericMotionEvent(event)) return true;
+			return super.onGenericMotionEvent(event);
+			
+		}
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
 
@@ -508,83 +567,104 @@ public class GL2JNIActivity extends Activity {
 				LayoutParams.WRAP_CONTENT);
 	}
 
+	private boolean handleRetroXKey(int keyCode, KeyEvent event) {
+        boolean keyDown = event.getAction() == KeyEvent.ACTION_DOWN;
+        
+    	if (RetroBoxDialog.isDialogVisible(this)) {
+    		if (keyDown) {
+    			return RetroBoxDialog.onKeyDown(this, keyCode, event);
+    		} else {
+    			return RetroBoxDialog.onKeyUp(this, keyCode, event);
+    		}
+    	}
+    	return mapper.handleKeyEvent(event, keyCode, keyDown);
+	}
+	
 	public boolean onKeyUp(int keyCode, KeyEvent event) {
-		Integer playerNum = Arrays.asList(pad.name).indexOf(event.getDeviceId());
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD && playerNum == -1) {
-			playerNum = pad.deviceDescriptor_PlayerNum
-				.get(pad.deviceId_deviceDescriptor.get(event.getDeviceId()));
-		} else {
-			playerNum = -1;
-		}
-
-		if (playerNum != null && playerNum != -1) {
-			if (pad.compat[playerNum] || pad.custom[playerNum]) {
-				String id = pad.portId[playerNum];
-				if (keyCode == prefs.getInt(Gamepad.pref_button_l + id,
-						KeyEvent.KEYCODE_BUTTON_L1)
-						|| keyCode == prefs.getInt(Gamepad.pref_button_r + id,
-								KeyEvent.KEYCODE_BUTTON_R1)) {
-					return simulatedTouchEvent(playerNum, 0.0f, 0.0f);
+        if (isRetroX) {
+        	return handleRetroXKey(keyCode, event) || super.onKeyUp(keyCode, event);
+        } else {
+			Integer playerNum = Arrays.asList(pad.name).indexOf(event.getDeviceId());
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD && playerNum == -1) {
+				playerNum = pad.deviceDescriptor_PlayerNum
+					.get(pad.deviceId_deviceDescriptor.get(event.getDeviceId()));
+			} else {
+				playerNum = -1;
+			}
+	
+			if (playerNum != null && playerNum != -1) {
+				if (pad.compat[playerNum] || pad.custom[playerNum]) {
+					String id = pad.portId[playerNum];
+					if (keyCode == prefs.getInt(Gamepad.pref_button_l + id,
+							KeyEvent.KEYCODE_BUTTON_L1)
+							|| keyCode == prefs.getInt(Gamepad.pref_button_r + id,
+									KeyEvent.KEYCODE_BUTTON_R1)) {
+						return simulatedTouchEvent(playerNum, 0.0f, 0.0f);
+					}
 				}
 			}
-		}
-
-		return handle_key(playerNum, keyCode, false)
-				|| super.onKeyUp(keyCode, event);
+	
+			return handle_key(playerNum, keyCode, false)
+					|| super.onKeyUp(keyCode, event);
+        }
 	}
 
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		Integer playerNum = Arrays.asList(pad.name).indexOf(event.getDeviceId());
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD && playerNum == -1) {
-			playerNum = pad.deviceDescriptor_PlayerNum
-				.get(pad.deviceId_deviceDescriptor.get(event.getDeviceId()));
-		} else {
-			playerNum = -1;
-		}
-
-		if (playerNum != null && playerNum != -1) {
-			if (pad.compat[playerNum] || pad.custom[playerNum]) {
-				String id = pad.portId[playerNum];
-				if (keyCode == prefs.getInt(Gamepad.pref_button_l + id, KeyEvent.KEYCODE_BUTTON_L1)) {
-					return simulatedTouchEvent(playerNum, 1.0f, 0.0f);
+        if (isRetroX) {
+			if (keyCode == KeyEvent.KEYCODE_BACK) {
+				if (!RetroBoxDialog.cancelDialog(this)) {
+					openRetroBoxMenu(true);
 				}
-				if (keyCode == prefs.getInt(Gamepad.pref_button_r + id, KeyEvent.KEYCODE_BUTTON_R1)) {
-					return simulatedTouchEvent(playerNum, 0.0f, 1.0f);
-				}
-			}
-		}
-
-		if (handle_key(playerNum, keyCode, true)) {
-			if (playerNum == 0)
-				JNIdc.hide_osd();
-			return true;
-		}
-
-		if (keyCode == pad.getSelectButtonCode()) {
-			return showMenu();
-		} 
-		if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD_MR1
-				|| (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH 
-				&& ViewConfiguration.get(this).hasPermanentMenuKey())) {
-			if (keyCode == KeyEvent.KEYCODE_MENU) {
-				return showMenu();
-			}
-		}
-		if (keyCode == KeyEvent.KEYCODE_BACK) {
-			if (isRetroX) {
-				if (RetroBoxDialog.cancelDialog(this)) return true;
-		    	
-		    	openRetroBoxMenu(true);
 		    	return true;
+			}
+        	return handleRetroXKey(keyCode, event) || super.onKeyDown(keyCode, event);
+        } else {
+
+			Integer playerNum = Arrays.asList(pad.name).indexOf(event.getDeviceId());
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD && playerNum == -1) {
+				playerNum = pad.deviceDescriptor_PlayerNum
+					.get(pad.deviceId_deviceDescriptor.get(event.getDeviceId()));
 			} else {
+				playerNum = -1;
+			}
+	
+			if (playerNum != null && playerNum != -1) {
+				if (pad.compat[playerNum] || pad.custom[playerNum]) {
+					String id = pad.portId[playerNum];
+					if (keyCode == prefs.getInt(Gamepad.pref_button_l + id, KeyEvent.KEYCODE_BUTTON_L1)) {
+						return simulatedTouchEvent(playerNum, 1.0f, 0.0f);
+					}
+					if (keyCode == prefs.getInt(Gamepad.pref_button_r + id, KeyEvent.KEYCODE_BUTTON_R1)) {
+						return simulatedTouchEvent(playerNum, 0.0f, 1.0f);
+					}
+				}
+			}
+	
+			if (handle_key(playerNum, keyCode, true)) {
+				if (playerNum == 0)
+					JNIdc.hide_osd();
+				return true;
+			}
+	
+			if (keyCode == pad.getSelectButtonCode()) {
+				return showMenu();
+			} 
+			if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.GINGERBREAD_MR1
+					|| (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH 
+					&& ViewConfiguration.get(this).hasPermanentMenuKey())) {
+				if (keyCode == KeyEvent.KEYCODE_MENU) {
+					return showMenu();
+				}
+			}
+			if (keyCode == KeyEvent.KEYCODE_BACK) {
 				if (pad.isXperiaPlay) {
 					return true;
 				} else {
 					return showMenu();
 				}
 			}
-		}
-		return super.onKeyDown(keyCode, event);
+			return super.onKeyDown(keyCode, event);
+        }
 	}
 
 	public GL2JNIView getGameView() {
@@ -699,10 +779,115 @@ public class GL2JNIActivity extends Activity {
 			public void onError() {
 				resume();
 			}
-			
 		});
-    	
     }
     
+	class VirtualInputDispatcher implements VirtualEventDispatcher {
+    	int maskMap[] = {
+    			Gamepad.key_CONT_DPAD_UP, Gamepad.key_CONT_DPAD_DOWN, Gamepad.key_CONT_DPAD_LEFT, Gamepad.key_CONT_DPAD_RIGHT,
+    			Gamepad.key_CONT_A, Gamepad.key_CONT_B, Gamepad.key_CONT_X, Gamepad.key_CONT_Y,
+    			0, 0, MotionEvent.AXIS_LTRIGGER, MotionEvent.AXIS_RTRIGGER,
+    			0, 0, 0, Gamepad.key_CONT_START
+    	};
+    	
+    	private int DPAD_UP    = 0;
+    	private int DPAD_DOWN  = 1;
+    	private int DPAD_LEFT  = 2;
+    	private int DPAD_RIGHT = 3;
+    	
+    	
+    	public boolean[][] buttons = new boolean[4][maskMap.length];
+    	
+    	private static final int ANALOG_MAX_X = 126;
+    	private static final int ANALOG_MAX_Y = 126;
+    	int analogX[] = new int[4];
+    	int analogY[] = new int[4];
+    	int tl[] = new int[4];
+    	int tr[] = new int[4];
+    	int analogTL[] = new int[4];
+    	int analogTR[] = new int[4];
 
+    	@Override
+    	public void sendAnalog(GenericGamepad gamepad, GenericGamepad.Analog index, double x, double y, double hatx, double haty) {
+    		int player = gamepad.player;
+    		
+    		if (index == Analog.LEFT) {
+    		
+	    		int newX = (int)(ANALOG_MAX_X * x);
+	    		int newY = (int)(ANALOG_MAX_Y * y);
+
+	    		analogX[player] = newX;
+	    		analogY[player] = -newY;
+	    		
+	    		buttons[player][DPAD_UP]    = haty < 0;
+	    		buttons[player][DPAD_DOWN]  = haty > 0;
+	    		
+	    		buttons[player][DPAD_LEFT]  = hatx < 0;
+	    		buttons[player][DPAD_RIGHT] = hatx > 0;
+	    		
+    		}
+    		notifyChange(player);
+    	};
+    	
+    	public void sendTriggers(GenericGamepad gamepad, int deviceId, float left, float right) {
+    		int player = gamepad.player;
+			analogTL[player] = (int)(left * 255);
+			analogTR[player] = (int)(right * 255);
+			notifyChange(player);
+		}
+
+		private void notifyChange(int player) {
+    		GL2JNIView.jx[player] = analogX[player];
+    		GL2JNIView.jy[player] = analogY[player];
+    		
+    		int state = 0xFFFF;
+    		for(int i=0; i<buttons[player].length; i++) {
+    			boolean isPressed = buttons[player][i];
+    			
+    			if (maskMap[i] == MotionEvent.AXIS_LTRIGGER) {
+    				tl[player] = isPressed ? 255 : 0;
+    			} else if (maskMap[i] == MotionEvent.AXIS_RTRIGGER) {
+    				tr[player] = isPressed ? 255 : 0;
+    			} else {
+    				if (isPressed) state &= ~maskMap[i];
+    			}
+    		}
+
+    		GL2JNIView.lt[player] = analogTL[player] > 0 ? analogTL[player] : tl[player];
+    		GL2JNIView.rt[player] = analogTR[player] > 0 ? analogTR[player] : tr[player];
+    		
+    		GL2JNIView.kcode_raw[player] = state;
+    		
+    		/*
+    		Log.d("INPUT", GL2JNIView.jx[player] + ", " + GL2JNIView.jy[player] + " l:" + GL2JNIView.lt[player] + " r:" + GL2JNIView.rt[player] +
+    				" " + GL2JNIView.kcode_raw[player]);
+    		*/
+    		
+    		mView.pushInput();
+    	}
+    	
+		@Override
+		public void sendKey(GenericGamepad gamepad, int keyCode, boolean down) {
+			int index = gamepad.getOriginIndex(keyCode);
+			if (index>=0) {
+				buttons[gamepad.player][index] = down;
+				notifyChange(gamepad.player);
+			}
+		}
+
+		@Override
+		public void sendMouseButton(MouseButton button, boolean down) {}
+
+		@Override
+		public boolean handleShortcut(ShortCut shortcut, boolean down) {
+			switch(shortcut) {
+			case EXIT: if (!down) uiQuit(); return true;
+			case MENU : if (!down) openRetroBoxMenu(true); return true;
+			default:
+				return false;
+			}
+		}
+    }
+
+    
 }
