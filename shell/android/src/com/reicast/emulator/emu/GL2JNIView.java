@@ -32,6 +32,7 @@ import android.view.ScaleGestureDetector.SimpleOnScaleGestureListener;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
+import retrobox.vinput.Mapper;
 
 import com.android.util.FileUtils;
 import com.reicast.emulator.GL2JNIActivity;
@@ -340,6 +341,8 @@ public class GL2JNIView extends GLSurfaceView
 
 	@Override public boolean onTouchEvent(final MotionEvent event) 
 	{
+		if (Mapper.hasGamepads()) return false;
+		
 		JNIdc.show_osd();
 
 		scaleGestureDetector.onTouchEvent(event);
