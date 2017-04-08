@@ -25,7 +25,7 @@ public class RetroXActivity extends Activity {
 		
 		// Read intent from RetroX
 		String gamePath = getIntent().getStringExtra("gamePath");
-		onGameSelected(Uri.parse(gamePath));
+		onGameSelected(gamePath == null ? Uri.EMPTY : Uri.parse(gamePath)); // boot BIOS when empty
 
 		// Flush the intent to prevent multiple calls
 		getIntent().setData(null);
