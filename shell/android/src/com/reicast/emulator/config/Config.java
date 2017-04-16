@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 
 import com.android.util.DreamTime;
@@ -43,6 +44,8 @@ public class Config {
 	public static final String pref_vibrationDuration = "vibration_duration";
 	public static final String pref_mic = "mic_plugged_in";
 	public static final String pref_vmu = "vmu_floating";
+	
+	public static final String pref_from_retrox = "retrox";
 
 	public static boolean dynarecopt = true;
 	public static boolean idleskip = true;
@@ -62,6 +65,7 @@ public class Config {
 	public static String cheatdisk = "null";
 	public static boolean usereios = false;
 	public static boolean nativeact = false;
+	public static boolean fromretrox = false;
 	public static int vibrationDuration = 20;
 
 	public static String git_api = "https://api.github.com/repos/reicast/reicast-emulator/commits";
@@ -97,6 +101,14 @@ public class Config {
 		Config.cheatdisk = mPrefs.getString(pref_cheatdisk, cheatdisk);
 		Config.usereios = mPrefs.getBoolean(pref_usereios, usereios);
 		Config.nativeact = mPrefs.getBoolean(pref_nativeact, nativeact);
+		Config.fromretrox = mPrefs.getBoolean(pref_from_retrox, fromretrox);
+	}
+	
+	public void saveRetroXSettings() {
+		Editor editor = mPrefs.edit();
+		editor.putBoolean(pref_widescreen, Config.widescreen);
+		editor.putBoolean(pref_from_retrox, true);
+		editor.commit();
 	}
 
 	/**

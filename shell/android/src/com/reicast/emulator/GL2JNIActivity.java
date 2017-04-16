@@ -52,6 +52,7 @@ import retrobox.vinput.VirtualEvent.MouseButton;
 import retrobox.vinput.VirtualEventDispatcher;
 import retrox.reicast.emulator.R;
 import tv.ouya.console.api.OuyaController;
+import xtvapps.core.AndroidCoreUtils;
 import xtvapps.core.AndroidFonts;
 import xtvapps.core.Callback;
 import xtvapps.core.SimpleCallback;
@@ -133,6 +134,12 @@ public class GL2JNIActivity extends Activity {
 		boolean controllerFourConnected = false;
 		
 		if (isRetroX) {
+            for(int i=0; i<4; i++) {
+            	String prefix = "j" + (i+1);
+            	String deviceDescriptor = getIntent().getStringExtra(prefix + "DESCRIPTOR");
+        		Mapper.registerGamepad(i, deviceDescriptor);
+            }
+
 			controllerTwoConnected   = Mapper.hasGamepad(1);
 			controllerThreeConnected = Mapper.hasGamepad(2);
 			controllerFourConnected  = Mapper.hasGamepad(3);
@@ -229,7 +236,13 @@ public class GL2JNIActivity extends Activity {
 			pad.fullCompatibilityMode(prefs);
 		}
 
+		
+		if (isRetroX && !Config.fromretrox) { // only use default value if the user has never changed the value
+			Config.widescreen = !getIntent().getBooleanExtra("keepAspect", true);
+		}
+		
 		config.loadConfigurationPrefs();
+
 
 		// When viewing a resource, pass its URI to the native code for opening
 		if (getIntent().getAction().equals("com.reicast.EMULATOR"))
@@ -243,12 +256,6 @@ public class GL2JNIActivity extends Activity {
 			setContentView(R.layout.game_view);
 			ViewGroup containerView = (ViewGroup)findViewById(R.id.game_view);
 			containerView.addView(mView, 0);
-			
-            for(int i=0; i<4; i++) {
-            	String prefix = "j" + (i+1);
-            	String deviceDescriptor = getIntent().getStringExtra(prefix + "DESCRIPTOR");
-        		Mapper.registerGamepad(i, deviceDescriptor);
-            }
 			
         	vinputDispatcher = new VirtualInputDispatcher();
         	
@@ -797,6 +804,7 @@ public class GL2JNIActivity extends Activity {
     	
     	List<ListOption> options = new ArrayList<ListOption>();
     	options.add(new ListOption("", getString(R.string.emu_opt_cancel)));
+    	options.add(new ListOption("wide", "Screen Size", !Config.widescreen ? "Set Wide Screen 16:9":"Set Original 4:3")); // TODO Translate
     	options.add(new ListOption("help", getString(R.string.emu_opt_help)));
     	options.add(new ListOption("quit", getString(R.string.emu_opt_quit)));
     	
@@ -810,6 +818,14 @@ public class GL2JNIActivity extends Activity {
 				} else if (key.equals("help")) {
 					uiHelp();
 					return;
+				} else if (key.equals("wide")) {
+					Config.widescreen = !Config.widescreen;
+					config.saveRetroXSettings();
+
+					JNIdc.widescreen(Config.widescreen ? 1 : 0);
+					if (Config.widescreen) {
+						AndroidCoreUtils.toast(GL2JNIActivity.this, "Notice: Not all games are compatible with wide screen mode"); // TODO Translate
+					}
 				}
 				closeRetroXMenu();
 			}
