@@ -131,25 +131,32 @@ public class GL2JNIActivity extends Activity {
 		boolean controllerTwoConnected = false;
 		boolean controllerThreeConnected = false;
 		boolean controllerFourConnected = false;
+		
+		if (isRetroX) {
+			controllerTwoConnected   = Mapper.hasGamepad(1);
+			controllerThreeConnected = Mapper.hasGamepad(2);
+			controllerFourConnected  = Mapper.hasGamepad(3);
+		} else {
 
-		for (HashMap.Entry<String, Integer> e : pad.deviceDescriptor_PlayerNum
-				.entrySet()) {
-			String descriptor = e.getKey();
-			Integer playerNum = e.getValue();
-
-			switch (playerNum) {
-			case 1:
-				if (descriptor != null)
-					controllerTwoConnected = true;
-				break;
-			case 2:
-				if (descriptor != null)
-					controllerThreeConnected = true;
-				break;
-			case 3:
-				if (descriptor != null)
-					controllerFourConnected = true;
-				break;
+			for (HashMap.Entry<String, Integer> e : pad.deviceDescriptor_PlayerNum
+					.entrySet()) {
+				String descriptor = e.getKey();
+				Integer playerNum = e.getValue();
+	
+				switch (playerNum) {
+				case 1:
+					if (descriptor != null)
+						controllerTwoConnected = true;
+					break;
+				case 2:
+					if (descriptor != null)
+						controllerThreeConnected = true;
+					break;
+				case 3:
+					if (descriptor != null)
+						controllerFourConnected = true;
+					break;
+				}
 			}
 		}
 
