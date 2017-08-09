@@ -44,6 +44,7 @@ import com.reicast.emulator.debug.GenerateLogs;
 import com.reicast.emulator.emu.JNIdc;
 import com.reicast.emulator.periph.Gamepad;
 
+@SuppressLint("NewApi")
 public class MainActivity extends FragmentActivity implements
 		FileBrowser.OnItemSelectedListener, OptionsFragment.OnClickListener {
 	
@@ -61,6 +62,7 @@ public class MainActivity extends FragmentActivity implements
 
 	Gamepad pad = new Gamepad();
 
+	@SuppressLint("NewApi")
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -604,6 +606,7 @@ public class MainActivity extends FragmentActivity implements
 		mDrawerToggle.syncState();
 	}
 	
+	@SuppressLint("NewApi")
 	@Override
 	public void onWindowFocusChanged(boolean hasFocus) {
 		super.onWindowFocusChanged(hasFocus);
