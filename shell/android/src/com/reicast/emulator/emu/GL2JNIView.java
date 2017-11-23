@@ -593,10 +593,11 @@ public class GL2JNIView extends GLSurfaceView
 			public void logFrame() {
 				frames++;
 				if (System.nanoTime() - startTime >= 1000000000) {
+					final int currentFrame = frames;
 					mView.post(new Runnable() {
 						public void run() {
-							if (frames > 0) {
-								fpsPop.setText(frames);
+							if (currentFrame > 0) {
+								fpsPop.setText(currentFrame);
 							}
 						}
 					});

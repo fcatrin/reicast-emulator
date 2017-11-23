@@ -252,7 +252,10 @@ public class GL2JNIActivity extends Activity {
 		mView = new GL2JNIView(GL2JNIActivity.this, config, fileName, false,
 				prefs.getInt(Config.pref_renderdepth, 24), 0, false);
 		
+		boolean retroXShowFPS = false;
 		if (isRetroX) {
+			retroXShowFPS = getIntent().getBooleanExtra(Config.pref_showfps, false);
+			
 			setContentView(R.layout.game_view);
 			ViewGroup containerView = (ViewGroup)findViewById(R.id.game_view);
 			containerView.addView(mView, 0);
@@ -318,7 +321,7 @@ public class GL2JNIActivity extends Activity {
 			});
 		}
 		JNIdc.setupVmu(menu.getVmu());
-		if (prefs.getBoolean(Config.pref_showfps, false)) {
+		if (prefs.getBoolean(Config.pref_showfps, false) || retroXShowFPS) {
 			fpsPop = menu.new FpsPopup(this);
 			mView.setFpsDisplay(fpsPop);
 			mView.post(new Runnable() {
