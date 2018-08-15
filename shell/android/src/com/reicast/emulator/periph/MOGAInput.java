@@ -22,7 +22,7 @@ import com.bda.controller.MotionEvent;
 import com.bda.controller.StateEvent;
 import com.reicast.emulator.GL2JNIActivity;
 import com.reicast.emulator.GL2JNINative;
-import retrox.reicast.emulator.R;
+import xtvapps.prg.reicast.emulator.R;
 
 /******************************************************************************/
 

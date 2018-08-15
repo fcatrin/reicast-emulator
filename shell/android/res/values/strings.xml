@@ -130,6 +130,8 @@
     <string name="platform">Copying logcat content to clipboard\nPlease paste in the issue report</string>
     <string name="log_saved">Log saved to \"Files Dir\" path</string>
     
+    <string name="emu_opt_title">PRG Options</string>
+    
     <!-- Onscreen Menu -->
     <string name="popup_button_back">Back</string>
     <string name="popup_button_disk">Disk Swap</string>

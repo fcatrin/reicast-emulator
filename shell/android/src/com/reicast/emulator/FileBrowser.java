@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Locale;
 
 import org.apache.commons.lang3.StringUtils;
-import retrox.reicast.emulator.R;
+import xtvapps.prg.reicast.emulator.R;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;

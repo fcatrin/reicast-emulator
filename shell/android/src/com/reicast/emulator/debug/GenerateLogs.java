@@ -14,7 +14,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.widget.Toast;
 
-import retrox.reicast.emulator.R;
+import xtvapps.prg.reicast.emulator.R;
 
 public class GenerateLogs extends AsyncTask<String, Integer, String> {
 

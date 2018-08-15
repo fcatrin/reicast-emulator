@@ -50,7 +50,7 @@ import retrobox.vinput.Mapper;
 import retrobox.vinput.Mapper.ShortCut;
 import retrobox.vinput.VirtualEvent.MouseButton;
 import retrobox.vinput.VirtualEventDispatcher;
-import retrox.reicast.emulator.R;
+import xtvapps.prg.reicast.emulator.R;
 import tv.ouya.console.api.OuyaController;
 import xtvapps.core.AndroidCoreUtils;
 import xtvapps.core.AndroidFonts;

@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.concurrent.ExecutionException;
-import retrox.reicast.emulator.R;
+import xtvapps.prg.reicast.emulator.R;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;

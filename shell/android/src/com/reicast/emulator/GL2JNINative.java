@@ -2,7 +2,7 @@ package com.reicast.emulator;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import retrox.reicast.emulator.R;
+import xtvapps.prg.reicast.emulator.R;
 import tv.ouya.console.api.OuyaController;
 import android.annotation.TargetApi;
 import android.app.NativeActivity;
