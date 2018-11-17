@@ -36,7 +36,7 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import xtvapps.prg.reicast.emulator.R;
+import xtvapps.res.reicast.emulator.R;
 import com.reicast.emulator.periph.Gamepad;
 
 public class InputModFragment extends Fragment {

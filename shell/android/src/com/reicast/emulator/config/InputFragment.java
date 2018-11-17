@@ -35,7 +35,7 @@ import com.bda.controller.ControllerListener;
 import com.bda.controller.MotionEvent;
 import com.bda.controller.StateEvent;
 import com.reicast.emulator.MainActivity;
-import xtvapps.prg.reicast.emulator.R;
+import xtvapps.res.reicast.emulator.R;
 import com.reicast.emulator.periph.Gamepad;
 import com.reicast.emulator.periph.MOGAInput;
 

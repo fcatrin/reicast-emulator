@@ -42,7 +42,7 @@ import android.widget.Toast;
 
 import com.android.util.FileUtils;
 import com.reicast.emulator.FileBrowser;
-import xtvapps.prg.reicast.emulator.R;
+import xtvapps.res.reicast.emulator.R;
 import com.reicast.emulator.emu.GL2JNIView;
 import com.reicast.emulator.emu.JNIdc;
 

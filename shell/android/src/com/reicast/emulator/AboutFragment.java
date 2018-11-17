@@ -17,7 +17,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import xtvapps.prg.reicast.emulator.R;
+import xtvapps.res.reicast.emulator.R;
 import android.annotation.TargetApi;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.AsyncTask;

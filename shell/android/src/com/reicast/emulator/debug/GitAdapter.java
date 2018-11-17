@@ -30,7 +30,7 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
-import xtvapps.prg.reicast.emulator.R;
+import xtvapps.res.reicast.emulator.R;
 
 public class GitAdapter extends BaseAdapter {
 

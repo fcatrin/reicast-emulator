@@ -3,7 +3,7 @@ package com.reicast.emulator;
 import java.io.File;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.List;
-import xtvapps.prg.reicast.emulator.R;
+import xtvapps.res.reicast.emulator.R;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
