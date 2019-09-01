@@ -1,6 +1,18 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.reicast.emulator">
+    package="xtvapps.retrox.reicast.emulator"
+    android:versionCode="801103900"
+    android:versionName="8.01-1039-00"
+    android:sharedUserId="psychoworld.retrobox.v2"
+    >
+    
+<!-- 
+Original source:
 
+REICAST_VERSION "r8.1-1039-g536690af"
+GIT_HASH "536690af"
+BUILD_DATE "2019-08-31 20:11:55 -04"
+-->    
+    
     <supports-screens
         android:anyDensity="true"
         android:largeScreens="true"
@@ -33,6 +45,10 @@
         android:name="android.software.leanback" 
         android:required="false" />
 
+    <uses-sdk
+        android:minSdkVersion="19"
+        android:targetSdkVersion="26" />
+    
     <application
         android:name="com.reicast.emulator.Emulator"
         android:icon="@drawable/ic_launcher"

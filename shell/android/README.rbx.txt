@@ -10,5 +10,5 @@ export ANDROID_NDK=$NDK
 export ANDROID_NDK_HOME=$NDK
 export PATH=$NDK:$PATH
 
-
+if needed, follow build steps on .travis.yml
 
