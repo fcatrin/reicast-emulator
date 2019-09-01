@@ -47,7 +47,7 @@ BUILD_DATE "2019-08-31 20:11:55 -04"
 
     <uses-sdk
         android:minSdkVersion="19"
-        android:targetSdkVersion="26" />
+        android:targetSdkVersion="22" />
     
     <application
         android:name="com.reicast.emulator.Emulator"
