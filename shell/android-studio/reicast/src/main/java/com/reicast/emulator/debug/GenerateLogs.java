@@ -11,7 +11,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.TextView;
 
-import com.reicast.emulator.R;
+import xtvapps.retrox.reicast.emulator.R;
 import com.reicast.emulator.config.Config;
 
 import java.io.BufferedReader;
