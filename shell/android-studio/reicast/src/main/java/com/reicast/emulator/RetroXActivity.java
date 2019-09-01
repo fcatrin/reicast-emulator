@@ -20,7 +20,7 @@ public class RetroXActivity extends Activity {
 
 		// TODO set error handler
 
-		JNIdc.config(getFilesDir().getAbsolutePath()); // TODO check if this requires something special
+		// re-enable if needed after testing JNIdc.config(getFilesDir().getAbsolutePath()); // TODO check if this requires something special
 		
 		// Read intent from RetroX
 		String gamePath = getIntent().getStringExtra("PATH_GAME");
@@ -34,7 +34,7 @@ public class RetroXActivity extends Activity {
 		// Flush the intent to prevent multiple calls
 		getIntent().setData(null);
         setIntent(null);
-        Config.externalIntent = true;
+        // Config.externalIntent = true;
 
 	}
 	
@@ -44,10 +44,10 @@ public class RetroXActivity extends Activity {
 	}
 
 	public void onGameSelected(Uri uri) {
-		Config.nativeact = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean(Config.pref_nativeact, Config.nativeact);
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD && Config.nativeact) {
+		boolean useNative = true; // Config.nativeact = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean(Config.pref_nativeact, Config.nativeact);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD && useNative) {
 			startActivity(new Intent("com.reicast.EMULATOR", uri, getApplicationContext(),
-					GL2JNINative.class));
+					NativeGLActivity.class));
 		} else {
 			startActivity(new Intent("com.reicast.EMULATOR", uri, getApplicationContext(),
 					GL2JNIActivity.class));

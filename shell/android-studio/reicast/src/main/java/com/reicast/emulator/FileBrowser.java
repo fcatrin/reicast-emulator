@@ -5,7 +5,7 @@ import android.os.Environment;
 
 import com.reicast.emulator.config.Config;
 
-import org.apache.commons.lang3.StringUtils;
+import com.android.util.StringUtils;
 
 import java.io.File;
 import java.io.FileInputStream;

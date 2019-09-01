@@ -4,7 +4,6 @@ import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.support.v7.app.AppCompatDelegate;
 import android.util.Log;
 import android.net.Uri;
 import android.content.Intent;
@@ -102,6 +101,6 @@ public class Emulator extends Application {
     }
 
     static {
-        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
+        //AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
     }
 }
