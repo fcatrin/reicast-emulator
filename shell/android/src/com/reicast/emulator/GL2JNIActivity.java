@@ -44,8 +44,8 @@ import retrobox.utils.RetroBoxUtils;
 import retrobox.vinput.AnalogGamepad;
 import retrobox.vinput.AnalogGamepad.Axis;
 import retrobox.vinput.AnalogGamepadListener;
-import retrobox.vinput.GenericGamepad;
-import retrobox.vinput.GenericGamepad.Analog;
+import retrobox.vinput.GamepadDevice;
+import retrobox.vinput.GamepadMapping.Analog;
 import retrobox.vinput.Mapper;
 import retrobox.vinput.Mapper.ShortCut;
 import retrobox.vinput.VirtualEvent.MouseButton;
@@ -134,15 +134,12 @@ public class GL2JNIActivity extends Activity {
 		boolean controllerFourConnected = false;
 		
 		if (isRetroX) {
-            for(int i=0; i<4; i++) {
-            	String prefix = "j" + (i+1);
-            	String deviceDescriptor = getIntent().getStringExtra(prefix + "DESCRIPTOR");
-        		Mapper.registerGamepad(i, deviceDescriptor);
-            }
-
+			controllerTwoConnected   = Mapper.hasGamepads();
+			/*
 			controllerTwoConnected   = Mapper.hasGamepad(1);
 			controllerThreeConnected = Mapper.hasGamepad(2);
 			controllerFourConnected  = Mapper.hasGamepad(3);
+			*/
 		} else {
 
 			for (HashMap.Entry<String, Integer> e : pad.deviceDescriptor_PlayerNum
@@ -264,7 +261,6 @@ public class GL2JNIActivity extends Activity {
         	
             mapper = new Mapper(getIntent(), vinputDispatcher);
             Mapper.initGestureDetector(this);
-            Mapper.joinPorts = getIntent().getBooleanExtra("joinPorts", false);
             
         	analogGamepad = new AnalogGamepad(0, 0, new AnalogGamepadListener() {
     			
@@ -275,22 +271,22 @@ public class GL2JNIActivity extends Activity {
     			public void onMouseMove(int mousex, int mousey) {}
     			
     			@Override
-    			public void onAxisChange(GenericGamepad gamepad, float axisx, float axisy, float hatx, float haty, float raxisx, float raxisy) {
+    			public void onAxisChange(GamepadDevice gamepad, float axisx, float axisy, float hatx, float haty, float raxisx, float raxisy) {
 					vinputDispatcher.sendAnalog(gamepad, Analog.LEFT, axisx, -axisy, hatx, haty);
 					vinputDispatcher.sendAnalog(gamepad, Analog.RIGHT, raxisx, raxisy, 0, 0);
     			}
 
 				@Override
-				public void onDigitalX(GenericGamepad gamepad, Axis axis, boolean on) {}
+				public void onDigitalX(GamepadDevice gamepad, Axis axis, boolean on) {}
 
 				@Override
-				public void onDigitalY(GenericGamepad gamepad, Axis axis, boolean on) {}
+				public void onDigitalY(GamepadDevice gamepad, Axis axis, boolean on) {}
 				
 				@Override
 				public void onTriggers(String deviceDescriptor, int deviceId, boolean left, boolean right) {}
 				
 				@Override
-				public void onTriggersAnalog(GenericGamepad gamepad , int deviceId, float left, float right) {
+				public void onTriggersAnalog(GamepadDevice gamepad , int deviceId, float left, float right) {
 					vinputDispatcher.sendTriggers(gamepad, deviceId, left, right); 
 				}
 
@@ -781,7 +777,7 @@ public class GL2JNIActivity extends Activity {
     	GamepadInfoDialog gamepadInfoDialog = new GamepadInfoDialog(this);
         gamepadInfoDialog.loadFromIntent(getIntent());
 
-		RetroBoxDialog.showGamepadDialogIngame(this, gamepadInfoDialog, new SimpleCallback() {
+		RetroBoxDialog.showGamepadDialogIngame(this, gamepadInfoDialog, Mapper.hasGamepads(), new SimpleCallback() {
 			
 			@Override
 			public void onResult() {}
@@ -866,7 +862,7 @@ public class GL2JNIActivity extends Activity {
     	int analogTR[] = new int[4];
 
     	@Override
-    	public void sendAnalog(GenericGamepad gamepad, GenericGamepad.Analog index, double x, double y, double hatx, double haty) {
+    	public void sendAnalog(GamepadDevice gamepad, Analog index, double x, double y, double hatx, double haty) {
     		int player = gamepad.player;
     		
     		if (index == Analog.LEFT) {
@@ -887,7 +883,7 @@ public class GL2JNIActivity extends Activity {
     		notifyChange(player);
     	};
     	
-    	public void sendTriggers(GenericGamepad gamepad, int deviceId, float left, float right) {
+    	public void sendTriggers(GamepadDevice gamepad, int deviceId, float left, float right) {
     		int player = gamepad.player;
 			analogTL[player] = (int)(left * 255);
 			analogTR[player] = (int)(right * 255);
@@ -925,8 +921,8 @@ public class GL2JNIActivity extends Activity {
     	}
     	
 		@Override
-		public void sendKey(GenericGamepad gamepad, int keyCode, boolean down) {
-			int index = gamepad.getOriginIndex(keyCode);
+		public void sendKey(GamepadDevice gamepad, int keyCode, boolean down) {
+			int index = gamepad.getGamepadMapping().getOriginIndex(keyCode);
 			if (index>=0) {
 				buttons[gamepad.player][index] = down;
 				notifyChange(gamepad.player);
