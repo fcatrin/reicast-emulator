@@ -582,7 +582,7 @@ public class GL2JNIActivity extends Activity {
     			return RetroBoxDialog.onKeyUp(this, keyCode, event);
     		}
     	}
-    	return mapper.handleKeyEvent(event, keyCode, keyDown);
+    	return mapper.handleKeyEvent(this, event, keyCode, keyDown);
 	}
 	
 	public boolean onKeyUp(int keyCode, KeyEvent event) {
