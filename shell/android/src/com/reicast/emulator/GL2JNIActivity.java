@@ -134,7 +134,9 @@ public class GL2JNIActivity extends Activity {
 		boolean controllerFourConnected = false;
 		
 		if (isRetroX) {
-			controllerTwoConnected   = Mapper.hasGamepads();
+			controllerTwoConnected   = true;
+			controllerThreeConnected = true;
+			controllerFourConnected  = true;
 			/*
 			controllerTwoConnected   = Mapper.hasGamepad(1);
 			controllerThreeConnected = Mapper.hasGamepad(2);

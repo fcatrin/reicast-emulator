@@ -100,9 +100,9 @@ public class GL2JNINative extends NativeActivity {
 		moga.onCreate(this, pad);
 		moga.mListener.setPlayerNum(1);
 
-		boolean controllerTwoConnected = false;
-		boolean controllerThreeConnected = false;
-		boolean controllerFourConnected = false;
+		boolean controllerTwoConnected = true;
+		boolean controllerThreeConnected = true;
+		boolean controllerFourConnected = true;
 
 		for (HashMap.Entry<String, Integer> e : pad.deviceDescriptor_PlayerNum
 				.entrySet()) {

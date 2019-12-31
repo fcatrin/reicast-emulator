@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="retrox.reicast.emulator"
-    android:versionCode="7004"
-    android:versionName="r7.004"
+    android:versionCode="7005"
+    android:versionName="r7.005"
     android:sharedUserId="psychoworld.retrobox.v2" >
     
     <supports-screens
