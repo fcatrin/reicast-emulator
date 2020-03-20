@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="xtvapps.prg.reicast.emulator"
-    android:versionCode="7003"
-    android:versionName="r7.003"
+    android:versionCode="7005"
+    android:versionName="r7.005"
     android:sharedUserId="xtvapps.prg.user" >
     
     <supports-screens
